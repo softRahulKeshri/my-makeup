@@ -63,7 +63,7 @@ export const GoldDrawingLoader = () => {
   return (
     <div
       ref={rootRef}
-      className="fixed inset-0 z-100 flex items-center justify-center bg-brand-bg"
+      className="fixed inset-0 z-[100] flex items-center justify-center bg-brand-bg"
       aria-hidden
       aria-busy="true"
     >

@@ -1,6 +1,4 @@
-/** Central paths for marketing media (swap files in /public without hunting imports). */
+/** Central paths for marketing media. */
 export const ASSETS = {
   jarPng: "/images/jar.png",
-  usageVideo: "/video/video_animation1.mp4",
-  usageVideoPoster: "/video/video-animation-poster.jpg",
 } as const;

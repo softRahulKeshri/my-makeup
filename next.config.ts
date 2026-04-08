@@ -8,6 +8,25 @@ const withPWA = withPWAInit({
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
+  /** Browsers request /favicon.ico by default; static SVG lives at /icon.svg. */
+  async redirects() {
+    return [
+      {
+        source: "/favicon.ico",
+        destination: "/icon.svg",
+        permanent: false,
+      },
+    ];
+  },
+  images: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "images.unsplash.com",
+        pathname: "/**",
+      },
+    ],
+  },
 };
 
 export default withPWA(nextConfig);

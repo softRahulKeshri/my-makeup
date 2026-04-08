@@ -1,22 +1,44 @@
 @import "tailwindcss";
 
 :root {
-  --brand-bg: #fcf9f1;
-  --brand-ink: #2d2926;
+  --brand-bg: #080706;
+  --brand-bg-2: #120f0c;
+  --brand-ink: #f4efe6;
+  --brand-ink-muted: rgba(244, 239, 230, 0.72);
   --brand-gold: #d4af37;
+  --brand-gold-bright: #f0d78c;
   --brand-turmeric: #e48f0f;
+  --brand-rose: #c9a19a;
+  /* Jar highlight / champagne specks */
+  --brand-champagne: #f7f2e8;
+  --brand-on-gold: #0e0d0b;
+  --brand-elevated: #141210;
+  --brand-glass: rgba(255, 255, 255, 0.06);
+  --lux-mesh-a: rgba(212, 175, 55, 0.22);
+  --lux-mesh-b: rgba(201, 161, 154, 0.12);
+  --lux-mesh-c: rgba(228, 143, 15, 0.14);
 }
 
 @theme inline {
   --color-brand-bg: var(--brand-bg);
+  --color-brand-bg-2: var(--brand-bg-2);
   --color-brand-ink: var(--brand-ink);
   --color-brand-gold: var(--brand-gold);
+  --color-brand-gold-bright: var(--brand-gold-bright);
   --color-brand-turmeric: var(--brand-turmeric);
+  --color-brand-rose: var(--brand-rose);
+  --color-brand-champagne: var(--brand-champagne);
+  --color-brand-on-gold: var(--brand-on-gold);
+  --color-brand-elevated: var(--brand-elevated);
+  --color-brand-glass: var(--brand-glass);
   --font-sans: var(--font-montserrat), ui-sans-serif, system-ui, sans-serif;
   --font-serif: var(--font-playfair), ui-serif, Georgia, serif;
+  --font-display: var(--font-cormorant), ui-serif, Georgia, serif;
+  --font-brand: var(--font-fraunces), ui-serif, Georgia, serif;
 }
 
 html {
+  /* Disable browser smooth-scroll — Lenis owns this */
   scroll-behavior: auto;
 }
 
@@ -29,6 +51,211 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* ── Performance: hint the GPU to composite these layers ahead of time ────────
+   Applied via Tailwind's will-change-transform utility on the elements.
+   Only add this where GSAP actually animates transforms — overuse wastes VRAM. */
+.will-change-transform {
+  will-change: transform;
+}
+
+/* Page backdrop: slow aurora + grain (no extra JS) */
+.lux-page-bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 120% 80% at 50% -20%, var(--lux-mesh-a), transparent 55%),
+    radial-gradient(ellipse 90% 60% at 100% 30%, var(--lux-mesh-b), transparent 50%),
+    radial-gradient(ellipse 70% 50% at 0% 80%, var(--lux-mesh-c), transparent 48%),
+    linear-gradient(180deg, var(--brand-bg-2) 0%, var(--brand-bg) 45%, #0a0908 100%);
+}
+
+.lux-page-bg::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  opacity: 0.06;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  mix-blend-mode: overlay;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .lux-page-bg {
+    animation: lux-aurora 22s ease-in-out infinite alternate;
+  }
+}
+
+@keyframes lux-aurora {
+  0% {
+    filter: hue-rotate(0deg) saturate(1);
+  }
+  100% {
+    filter: hue-rotate(12deg) saturate(1.08);
+  }
+}
+
+/* Product jar motion */
+@keyframes lux-jar-float {
+  0%,
+  100% {
+    transform: translateY(0) rotate(-0.6deg);
+  }
+  50% {
+    transform: translateY(-10px) rotate(0.6deg);
+  }
+}
+
+@keyframes lux-cream-wave {
+  0%,
+  100% {
+    transform: translateY(0) scaleY(1);
+  }
+  50% {
+    transform: translateY(-3px) scaleY(1.02);
+  }
+}
+
+@keyframes lux-orbit-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.lux-jar-float {
+  animation: lux-jar-float 5.5s ease-in-out infinite;
+}
+
+.lux-cream-wave {
+  transform-origin: center;
+  animation: lux-cream-wave 4s ease-in-out infinite;
+}
+
+.lux-orbit {
+  animation: lux-orbit-spin 48s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lux-jar-float,
+  .lux-cream-wave,
+  .lux-orbit {
+    animation: none !important;
+  }
+}
+
+/* Shimmer line for headings */
+@keyframes lux-shimmer {
+  0% {
+    background-position: 200% center;
+  }
+  100% {
+    background-position: -200% center;
+  }
+}
+
+.lux-text-shimmer {
+  background: linear-gradient(
+    110deg,
+    var(--brand-ink) 0%,
+    var(--brand-gold-bright) 45%,
+    var(--brand-ink) 90%
+  );
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .lux-text-shimmer {
+    animation: lux-shimmer 7s ease-in-out infinite;
+  }
+}
+
+/* CTA magnetic glow */
+.lux-btn-primary {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  transition:
+    transform 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.35s ease;
+}
+
+.lux-btn-primary::before {
+  content: "";
+  position: absolute;
+  inset: -40%;
+  background: conic-gradient(
+    from 180deg,
+    transparent,
+    rgba(212, 175, 55, 0.35),
+    transparent,
+    rgba(228, 143, 15, 0.25),
+    transparent
+  );
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  z-index: -1;
+  animation: lux-orbit-spin 8s linear infinite paused;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .lux-btn-primary:hover::before {
+    opacity: 1;
+    animation-play-state: running;
+  }
+}
+
+.lux-btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow:
+    0 18px 40px -12px rgba(212, 175, 55, 0.45),
+    0 0 0 1px rgba(212, 175, 55, 0.35);
+}
+
+/* Scroll hint */
+@keyframes lux-bounce-soft {
+  0%,
+  100% {
+    transform: translateY(0);
+    opacity: 0.85;
+  }
+  50% {
+    transform: translateY(6px);
+    opacity: 1;
+  }
+}
+
+.lux-scroll-hint {
+  animation: lux-bounce-soft 2.4s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lux-scroll-hint {
+    animation: none;
+  }
+}
+
+/* Ingredient cards */
+@keyframes lux-card-rise {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.lux-card-reveal {
+  animation: lux-card-rise 0.85s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
 /* Horizontal scroll: hide scrollbar but keep touch pan */
 .ingredients-scroll {
   scrollbar-width: none;
@@ -37,4 +264,248 @@ body {
 
 .ingredients-scroll::-webkit-scrollbar {
   display: none;
+}
+
+/* Ritual step pulse */
+@keyframes lux-step-glow {
+  0%,
+  100% {
+    box-shadow:
+      0 0 0 0 rgba(212, 175, 55, 0.35),
+      0 12px 40px -16px rgba(0, 0, 0, 0.5);
+  }
+  50% {
+    box-shadow:
+      0 0 0 10px rgba(212, 175, 55, 0),
+      0 18px 48px -12px rgba(212, 175, 55, 0.2);
+  }
+}
+
+.lux-step-active {
+  animation: lux-step-glow 3.2s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lux-step-active {
+    animation: none;
+  }
+}
+
+/* Company wordmark — heavy Fraunces + gold shimmer */
+.brand-name-gradient {
+  background: linear-gradient(
+    115deg,
+    #f8ecd4 0%,
+    #d4af37 28%,
+    #a67c1a 52%,
+    #f0d78c 78%,
+    #f8ecd4 100%
+  );
+  background-size: 220% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .brand-name-gradient {
+    animation: lux-shimmer 9s ease-in-out infinite;
+  }
+}
+
+/* Auto-scrolling ingredient strip */
+@keyframes ingredient-marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.ingredient-marquee-track {
+  animation: ingredient-marquee 52s linear infinite;
+  will-change: transform;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ingredient-marquee-track {
+    animation: none;
+  }
+}
+
+/* Ingredient glyph — orbit + gentle bob (CSS keeps GSAP surface small) */
+@keyframes ingredient-orbit-rotate {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes ingredient-glyph-bob {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-3px);
+  }
+}
+
+.ingredient-orbit-ring {
+  transform-origin: 48px 48px;
+  animation: ingredient-orbit-rotate 52s linear infinite;
+}
+
+.ingredient-glyph-bob {
+  animation: ingredient-glyph-bob 2.75s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ingredient-orbit-ring,
+  .ingredient-glyph-bob {
+    animation: none;
+  }
+}
+
+/* ── Luxury Cursor ────────────────────────────────────────────────────────────
+   The cursor elements are always in the DOM (rendered by LuxuryCursor.tsx)
+   but start at opacity:0.  JS reveals them once it confirms the device has
+   a real pointer (hover: hover media query).  This prevents the cursor showing
+   on touch-only devices even before hydration. */
+@media (hover: hover) and (pointer: fine) {
+  /* Force cursor:none on everything once JS has run.
+     The selector is set programmatically via document.body.style.cursor, but
+     this rule acts as an additional fallback during hydration. */
+  body.lux-cursor-active * {
+    cursor: none !important;
+  }
+}
+
+/* ── GSAP ScrollTrigger pin helpers ──────────────────────────────────────────
+   When ScrollTrigger pins an element it sets position:fixed.
+   Ensure the pinned panel always sits above the page background. */
+.pin-spacer {
+  pointer-events: none;
+}
+
+/* ── Section entrance baseline ───────────────────────────────────────────────
+   Elements with [data-ritual-header], [data-benefits-header], and
+   [data-ingredients-header] start invisible — GSAP reveals them on scroll.
+   We use visibility rather than display:none so screen readers still announce
+   the content before the animation fires. */
+[data-ritual-header],
+[data-benefits-header],
+[data-ingredients-header] {
+  opacity: 0; /* GSAP will animate to opacity:1 */
+}
+
+/* Reduced motion: immediately show all deferred elements. */
+@media (prefers-reduced-motion: reduce) {
+  [data-ritual-header],
+  [data-benefits-header],
+  [data-ingredients-header] {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}
+
+/* ── Hero entrance elements ───────────────────────────────────────────────────
+   GSAP animates these from opacity:0 on mount.  The CSS initial state ensures
+   no flash of un-animated content on slow connections. */
+.hero-reveal,
+.hero-char {
+  opacity: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-reveal,
+  .hero-char {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}
+
+/* ── Ingredient card entrance baseline ───────────────────────────────────────
+   Cards start invisible — GSAP reveals them on scroll. */
+[data-ingredient-card] {
+  opacity: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-ingredient-card] {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}
+
+/* ── Ritual step card entrance baseline (desktop: GSAP-controlled) ────────── */
+[data-ritual-step] {
+  /* Mobile (default): visible immediately, GSAP overrides on mount */
+}
+
+/* ── Progress dot baseline ─────────────────────────────────────────────────── */
+[data-progress-dot] {
+  background-color: rgba(212, 175, 55, 0.3);
+}
+
+/* ── Enhanced ritual step active glow ───────────────────────────────────────
+   The GSAP timeline applies box-shadow via inline style.
+   This CSS rule provides the persistent pulse animation for the middle
+   step card on mobile where there's no pinned timeline. */
+@keyframes lux-step-pulse {
+  0%, 100% {
+    box-shadow:
+      0 0 0 0 rgba(212, 175, 55, 0.4),
+      0 16px 48px -20px rgba(0, 0, 0, 0.6);
+  }
+  50% {
+    box-shadow:
+      0 0 0 8px rgba(212, 175, 55, 0),
+      0 24px 56px -16px rgba(212, 175, 55, 0.25);
+  }
+}
+
+/* ── Scroll-reveal benefit labels baseline ───────────────────────────────────
+   GSAP sets opacity:0 programmatically in BenefitsPinSection.
+   This ensures SSR-rendered HTML doesn't flash the labels before JS runs. */
+.benefits-label-init {
+  opacity: 0;
+}
+
+/* ── Golden orb pulse (ingredients reveal) — GPU-friendly ring expansion ───── */
+@keyframes ingredient-golden-pulse {
+  0% {
+    transform: scale(0.92);
+    opacity: 0.55;
+  }
+  70% {
+    opacity: 0.12;
+  }
+  100% {
+    transform: scale(1.65);
+    opacity: 0;
+  }
+}
+
+.ingredient-golden-pulse-ring {
+  border: 1px solid rgba(212, 175, 55, 0.45);
+  border-radius: 9999px;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .ingredient-golden-pulse-ring {
+    animation: ingredient-golden-pulse 2.4s ease-out infinite;
+  }
+}
+
+/* SSR: stages start hidden until GSAP runs */
+[data-ingredient-stage] {
+  opacity: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-ingredient-stage] {
+    opacity: 1 !important;
+    transform: none !important;
+  }
 }

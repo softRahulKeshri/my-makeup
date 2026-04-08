@@ -4,8 +4,8 @@
   "description": "Abha Cosmetic — Real glow, real you.",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#FCF9F1",
-  "theme_color": "#FCF9F1",
+  "background_color": "#080706",
+  "theme_color": "#080706",
   "orientation": "portrait-primary",
   "icons": [
     {
