@@ -1,0 +1,40 @@
+@import "tailwindcss";
+
+:root {
+  --brand-bg: #fcf9f1;
+  --brand-ink: #2d2926;
+  --brand-gold: #d4af37;
+  --brand-turmeric: #e48f0f;
+}
+
+@theme inline {
+  --color-brand-bg: var(--brand-bg);
+  --color-brand-ink: var(--brand-ink);
+  --color-brand-gold: var(--brand-gold);
+  --color-brand-turmeric: var(--brand-turmeric);
+  --font-sans: var(--font-montserrat), ui-sans-serif, system-ui, sans-serif;
+  --font-serif: var(--font-playfair), ui-serif, Georgia, serif;
+}
+
+html {
+  scroll-behavior: auto;
+}
+
+body {
+  min-height: 100dvh;
+  background-color: var(--brand-bg);
+  color: var(--brand-ink);
+  font-family: var(--font-montserrat), ui-sans-serif, system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Horizontal scroll: hide scrollbar but keep touch pan */
+.ingredients-scroll {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.ingredients-scroll::-webkit-scrollbar {
+  display: none;
+}
