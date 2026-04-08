@@ -2,7 +2,7 @@
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useState, type ReactNode } from "react";
-import { GoldenParticleField } from "@/components/effects/GoldenParticleField";
+import { ResponsiveGoldenParticleField } from "@/components/effects/ResponsiveGoldenParticleField";
 import { GoldDrawingLoader } from "@/components/loading/GoldDrawingLoader";
 import { SmoothScroll } from "@/components/scroll/SmoothScroll";
 import { LuxuryCursor } from "@/components/ui/LuxuryCursor";
@@ -35,7 +35,7 @@ export const Providers = ({ children }: ProvidersProps) => {
         <GoldDrawingLoader />
         <div className="relative min-h-dvh">
           <div className="lux-page-bg" aria-hidden />
-          <GoldenParticleField particleCount={72} />
+          <ResponsiveGoldenParticleField />
           <main className="relative z-10">{children}</main>
         </div>
       </SmoothScroll>

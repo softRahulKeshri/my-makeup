@@ -13,9 +13,9 @@ const JAR_HEIGHT = 944;
 
 export const ProductJarShowcase = ({
   widthClassName,
-  sizes = "(max-width: 768px) 78vw, 380px",
+  sizes = "(max-width: 768px) 92vw, 420px",
   priority,
-  alt = "Abha 15ml face cream jar",
+  alt = "Abha Luminous Skin Face Cream 15ml jar luxury packaging on dark background",
   interactive = true,
 }: ProductJarShowcaseProps) => {
   const rootRef = useRef<HTMLDivElement>(null);
@@ -168,7 +168,7 @@ export const ProductJarShowcase = ({
             height={JAR_HEIGHT}
             priority={priority}
             sizes={sizes}
-            className="relative z-10 mx-auto h-auto w-full max-w-[min(100%,420px)] object-contain"
+            className="relative z-10 mx-auto h-auto w-full max-w-[min(100%,460px)] object-contain"
             style={{
               WebkitMaskImage:
                 "radial-gradient(ellipse 80% 92% at 50% 48%, black 38%, rgba(0,0,0,0.88) 56%, transparent 76%)",

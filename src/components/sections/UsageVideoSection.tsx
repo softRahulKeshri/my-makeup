@@ -29,7 +29,7 @@ const STEPS = [
  * UsageVideoSection — "The three-beat glow sequence".
  *
  * Desktop (≥768px): cinematic pinned presentation.
- *   The section pins for 280% of viewport height. Each of the three step cards
+ *   The section pins for ~165% of viewport height (tuned for less scroll fatigue). Each step card
  *   enters the scene one by one, sequentially:
  *     1. Enter  — y: 55→0, scale: 0.94→1.04, opacity 0→1  (power4.out)
  *     2. Glow   — gold box-shadow pulses in (CSS already handles via lux-step-active)
@@ -69,13 +69,13 @@ export const UsageVideoSection = () => {
       // Triggers before the section pins so the heading is already readable.
       gsap.fromTo(
         headerEls,
-        { opacity: 0, y: 28 },
+        { opacity: 0, y: 22 },
         {
           opacity: 1,
           y: 0,
           duration: 0.95,
           stagger: 0.11,
-          ease: "power4.out",
+          ease: "power2.out",
           scrollTrigger: {
             trigger: section,
             start: "top 82%",
@@ -95,32 +95,30 @@ export const UsageVideoSection = () => {
           scrollTrigger: {
             trigger: section,
             start: "top top",
-            end: "+=280%",
-            scrub: 0.75,
+            end: "+=165%",
+            scrub: 1.1,
             pin: true,
             anticipatePin: 1,
           },
         });
 
-        const seg = 1 / steps.length; // ~0.333 per step
+        const seg = 1 / steps.length;
 
         steps.forEach((step, i) => {
           const at = i * seg;
 
-          // Phase 1 — Enter: slide up + fade in. power4.out = fast snap to position.
           tl.to(
             step,
             {
               opacity: 1,
               y: 0,
               scale: 1,
-              ease: "power4.out",
+              ease: "power2.out",
               duration: seg * 0.38,
             },
             at,
           );
 
-          // Phase 2 — Active glow: subtle scale bump + gold ring + warm shadow
           tl.to(
             step,
             {
@@ -128,11 +126,11 @@ export const UsageVideoSection = () => {
               boxShadow:
                 "0 0 0 1.5px rgba(212,175,55,0.65), 0 30px 64px -28px rgba(212,175,55,0.4)",
               duration: seg * 0.1,
+              ease: "sine.out",
             },
             at + seg * 0.38,
           );
 
-          // Progress dot — activates with the step
           if (dots[i]) {
             tl.to(
               dots[i],
@@ -140,12 +138,12 @@ export const UsageVideoSection = () => {
                 scale: 1.6,
                 backgroundColor: "#d4af37",
                 duration: seg * 0.12,
+                ease: "power2.out",
               },
               at + seg * 0.3,
             );
           }
 
-          // Phase 3 — Dim (all steps except the last)
           if (i < steps.length - 1) {
             tl.to(
               step,
@@ -153,9 +151,10 @@ export const UsageVideoSection = () => {
                 opacity: 0.35,
                 scale: 0.97,
                 boxShadow: "none",
-                duration: seg * 0.22,
+                duration: seg * 0.24,
+                ease: "power2.inOut",
               },
-              at + seg * 0.6,
+              at + seg * 0.58,
             );
 
             if (dots[i]) {
@@ -164,9 +163,10 @@ export const UsageVideoSection = () => {
                 {
                   scale: 0.8,
                   backgroundColor: "rgba(212,175,55,0.3)",
-                  duration: seg * 0.14,
+                  duration: seg * 0.16,
+                  ease: "power2.inOut",
                 },
-                at + seg * 0.6,
+                at + seg * 0.58,
               );
             }
           }
@@ -179,18 +179,18 @@ export const UsageVideoSection = () => {
 
       // ── Mobile: stagger reveal ────────────────────────────────────────────
       mm.add("(max-width: 767px)", () => {
-        gsap.set(steps, { opacity: 0, y: 42 });
+        gsap.set(steps, { opacity: 0, y: 32 });
 
         const tween = gsap.to(steps, {
           opacity: 1,
           y: 0,
-          duration: 0.8,
-          stagger: 0.16,
-          ease: "power4.out",
+          duration: 0.95,
+          stagger: 0.14,
+          ease: "power2.out",
           scrollTrigger: {
             trigger: section,
-            start: "top 72%",
-            toggleActions: "play none none reverse",
+            start: "top 76%",
+            toggleActions: "play none none none",
           },
         });
 
@@ -207,7 +207,7 @@ export const UsageVideoSection = () => {
     <section
       ref={sectionRef}
       id="usage"
-      className="relative px-5 py-24"
+      className="relative overflow-x-hidden px-5 py-14 md:py-20"
       aria-labelledby="usage-heading"
     >
       {/* Bottom glow — grounds the section visually */}
@@ -260,12 +260,12 @@ export const UsageVideoSection = () => {
       </div>
 
       {/* ── Step cards grid ─────────────────────────────────────────────── */}
-      <div className="relative mx-auto mt-16 grid max-w-3xl gap-5 md:grid-cols-3 md:gap-6">
+      <div className="relative mx-auto mt-10 grid w-full min-w-0 max-w-3xl grid-cols-1 gap-4 md:mt-14 md:grid-cols-3 md:gap-6">
         {STEPS.map((step, i) => (
           <div
             key={step.title}
             data-ritual-step
-            className="relative overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-b from-brand-elevated/95 to-brand-bg/90 p-6 shadow-[0_28px_56px_-32px_rgba(0,0,0,0.75)] backdrop-blur-md will-change-transform"
+            className="relative min-w-0 overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-b from-brand-elevated/95 to-brand-bg/90 p-6 shadow-[0_28px_56px_-32px_rgba(0,0,0,0.75)] backdrop-blur-md will-change-transform"
           >
             {/* Step number badge */}
             <div

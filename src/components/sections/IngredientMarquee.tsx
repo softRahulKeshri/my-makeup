@@ -17,18 +17,18 @@ export const IngredientMarquee = ({ slides }: IngredientMarqueeProps) => {
 
   return (
     <div
-      className="relative overflow-hidden py-4"
+      className="relative z-20 isolate overflow-hidden py-4"
       role="region"
       aria-label="Ingredient imagery"
     >
-      <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-16 bg-gradient-to-r from-brand-bg to-transparent" />
-      <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-16 bg-gradient-to-l from-brand-bg to-transparent" />
+      <div className="pointer-events-none absolute inset-y-0 left-0 z-20 w-16 bg-gradient-to-r from-brand-bg to-transparent" />
+      <div className="pointer-events-none absolute inset-y-0 right-0 z-20 w-16 bg-gradient-to-l from-brand-bg to-transparent" />
 
       <div className="flex w-max gap-4 md:gap-5 ingredient-marquee-track motion-reduce:animate-none">
         {loop.map((slide, i) => (
           <div
             key={`${slide.id}-${i}`}
-            className="relative h-36 w-52 shrink-0 overflow-hidden rounded-2xl border border-white/10 shadow-[0_20px_48px_-24px_rgba(0,0,0,0.75)] sm:h-40 sm:w-60 md:h-44 md:w-72"
+            className="relative z-10 h-36 w-52 shrink-0 overflow-hidden rounded-2xl border border-white/10 shadow-[0_20px_48px_-24px_rgba(0,0,0,0.75)] sm:h-40 sm:w-60 md:h-44 md:w-72"
           >
             <Image
               src={slide.src}

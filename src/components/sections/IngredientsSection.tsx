@@ -3,6 +3,7 @@
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
+import { Heart, Leaf, ShieldCheck } from "lucide-react";
 import { useId, useRef } from "react";
 import { IngredientGlyph } from "@/components/icons/IngredientGlyph";
 import type { IngredientCard } from "@/types/ingredients";
@@ -41,8 +42,8 @@ const INGREDIENTS: IngredientCard[] = [
 ];
 
 /**
- * Scroll-pinned “serum droplet” halo reveals each ingredient (beauty/skincare metaphor).
- * Timeline progress is scrubbed to scroll; prefers-reduced-motion falls back to a stacked list.
+ * Desktop: scroll-pinned serum droplet reveals each ingredient (scrubbed timeline).
+ * Mobile & reduced-motion: stacked list + short stagger — minimal scroll distance.
  */
 export const IngredientsSection = () => {
   const dropletGradientId = useId().replace(/:/g, "");
@@ -54,86 +55,121 @@ export const IngredientsSection = () => {
     () => {
       const outer = outerRef.current;
       const pin = pinRef.current;
-      const orb = orbRef.current;
-      if (!outer || !pin || !orb) return;
+      if (!outer || !pin) return;
 
-      const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
-      if (reduceMotion.matches) {
-        return;
-      }
-
-      const stages = gsap.utils.toArray<HTMLElement>(
+      const stagesAll = gsap.utils.toArray<HTMLElement>(
         outer.querySelectorAll("[data-ingredient-stage]"),
       );
-      const scrub = window.matchMedia("(max-width: 768px)").matches ? 0.8 : 1.2;
-      const n = INGREDIENTS.length;
-      const SEG = 0.25;
 
-      gsap.set(stages, { opacity: 0, y: 32 });
-      /** Grow from the tip — reads like a bead of serum landing on skin */
-      gsap.set(orb, {
-        scale: 0.06,
-        opacity: 0.92,
-        transformOrigin: "50% 78%",
-      });
-
-      const tl = gsap.timeline({
-        scrollTrigger: {
-          trigger: outer,
-          start: "top top",
-          /** Outer is `400svh` tall — pin until section fully scrolls through */
-          end: "bottom bottom",
-          pin,
-          scrub,
-          anticipatePin: 1,
-          invalidateOnRefresh: true,
-        },
-      });
-
-      for (let i = 0; i < n; i++) {
-        const t = i * SEG;
-
-        if (i === 0) {
-          tl.fromTo(
-            orb,
-            { scale: 0.06, opacity: 0.92 },
-            { scale: 1, opacity: 1, duration: 0.09, ease: "power2.out" },
-            t,
-          );
-        } else {
-          tl.fromTo(
-            orb,
-            { scale: 0.2, opacity: 0.52 },
-            { scale: 1, opacity: 1, duration: 0.09, ease: "power2.out" },
-            t,
-          );
-        }
-
-        tl.fromTo(
-          stages[i],
-          { opacity: 0, y: 28 },
-          { opacity: 1, y: 0, duration: 0.09, ease: "power2.out" },
-          t + 0.08,
-        );
-
-        if (i < n - 1) {
-          tl.to(
-            stages[i],
-            { opacity: 0, y: -12, duration: 0.05, ease: "power2.in" },
-            t + SEG - 0.05,
-          );
-          tl.to(
-            orb,
-            { scale: 0.18, opacity: 0.48, duration: 0.05, ease: "power2.in" },
-            t + SEG - 0.05,
-          );
-        }
-      }
-
-      return () => {
-        tl.scrollTrigger?.kill();
-        tl.kill();
+      /** Short scroll path: mobile, or reduced-motion everywhere — stacked list + stagger, no pin. */
+      const setupLightScroll = () => {
+        gsap.set(stagesAll, { opacity: 0, y: 22 });
+        const tween = gsap.to(stagesAll, {
+          opacity: 1,
+          y: 0,
+          duration: 0.95,
+          stagger: 0.1,
+          ease: "power2.out",
+          scrollTrigger: {
+            trigger: outer,
+            start: "top 82%",
+            /** No reverse — avoids sudden “snap back” when scrolling up. */
+            toggleActions: "play none none none",
+          },
+        });
+        return () => {
+          tween.scrollTrigger?.kill();
+          tween.kill();
+        };
       };
+
+      const mm = gsap.matchMedia();
+
+      mm.add("(prefers-reduced-motion: reduce), (max-width: 767px)", () =>
+        setupLightScroll(),
+      );
+
+      mm.add("(min-width: 768px) and (prefers-reduced-motion: no-preference)", () => {
+        const orb = orbRef.current;
+        if (!orb) return () => {};
+
+        const stages = gsap.utils.toArray<HTMLElement>(
+          outer.querySelectorAll("[data-ingredient-stage]"),
+        );
+        /** Higher scrub = scroll progress eases into each beat (less staccato). */
+        const scrub = 2;
+        const n = INGREDIENTS.length;
+        const SEG = 0.25;
+
+        gsap.set(stages, { opacity: 0, y: 28 });
+        gsap.set(orb, {
+          scale: 0.06,
+          opacity: 0.92,
+          transformOrigin: "50% 78%",
+        });
+
+        const tl = gsap.timeline({
+          scrollTrigger: {
+            trigger: outer,
+            start: "top top",
+            end: "bottom bottom",
+            pin,
+            scrub,
+            anticipatePin: 1,
+            invalidateOnRefresh: true,
+          },
+        });
+
+        for (let i = 0; i < n; i++) {
+          const t = i * SEG;
+          const fadeIn = 0.14;
+          const fadeOut = 0.12;
+
+          if (i === 0) {
+            tl.fromTo(
+              orb,
+              { scale: 0.06, opacity: 0.92 },
+              { scale: 1, opacity: 1, duration: fadeIn, ease: "sine.out" },
+              t,
+            );
+          } else {
+            tl.fromTo(
+              orb,
+              { scale: 0.2, opacity: 0.52 },
+              { scale: 1, opacity: 1, duration: fadeIn, ease: "sine.out" },
+              t,
+            );
+          }
+
+          tl.fromTo(
+            stages[i],
+            { opacity: 0, y: 28 },
+            { opacity: 1, y: 0, duration: fadeIn, ease: "sine.out" },
+            t + 0.08,
+          );
+
+          if (i < n - 1) {
+            /** Longer fade-out overlaps next beat — avoids empty “blinks” while scrubbing. */
+            tl.to(
+              stages[i],
+              { opacity: 0, y: -10, duration: fadeOut, ease: "sine.inOut" },
+              t + SEG - 0.05,
+            );
+            tl.to(
+              orb,
+              { scale: 0.2, opacity: 0.5, duration: fadeOut, ease: "sine.inOut" },
+              t + SEG - 0.05,
+            );
+          }
+        }
+
+        return () => {
+          tl.scrollTrigger?.kill();
+          tl.kill();
+        };
+      });
+
+      return () => mm.revert();
     },
     { scope: outerRef, dependencies: [] },
   );
@@ -141,7 +177,7 @@ export const IngredientsSection = () => {
   return (
     <section
       id="ingredients"
-      className="relative px-0 py-24"
+      className="relative px-0 py-14 md:py-20"
       aria-labelledby="ingredients-heading"
     >
       <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-brand-gold/35 to-transparent" />
@@ -157,22 +193,46 @@ export const IngredientsSection = () => {
           Ingredients with intention
         </h2>
         <p className="mx-auto mt-3 max-w-md text-sm text-brand-ink/65 md:text-[15px]">
-          Scroll to reveal each botanical — like a single drop of serum opening into its full
-          story.
+          <span className="md:hidden">
+            Four botanicals, formulated with care — aloe, citrus, turmeric, and avocado.
+          </span>
+          <span className="hidden md:inline">
+            Scroll to reveal each botanical — like a single drop of serum opening into its full
+            story.
+          </span>
         </p>
+
+        <ul className="mx-auto mt-8 flex max-w-lg flex-wrap items-center justify-center gap-x-8 gap-y-4 text-[11px] text-brand-ink/55 md:gap-x-10 md:text-xs">
+          <li className="flex items-center gap-2">
+            <Heart className="h-4 w-4 shrink-0 text-brand-gold/75" strokeWidth={1.25} aria-hidden />
+            <span className="font-medium tracking-wide">Cruelty-Free</span>
+          </li>
+          <li className="flex items-center gap-2">
+            <ShieldCheck
+              className="h-4 w-4 shrink-0 text-brand-gold/75"
+              strokeWidth={1.25}
+              aria-hidden
+            />
+            <span className="font-medium tracking-wide">Dermatologically Tested</span>
+          </li>
+          <li className="flex items-center gap-2">
+            <Leaf className="h-4 w-4 shrink-0 text-brand-gold/75" strokeWidth={1.25} aria-hidden />
+            <span className="font-medium tracking-wide">Vegan</span>
+          </li>
+        </ul>
       </div>
 
       <div
         ref={outerRef}
-        className="relative h-[400svh] motion-reduce:h-auto motion-reduce:py-12"
+        className="relative max-md:h-auto max-md:py-6 md:h-[180svh] lg:h-[220svh] motion-reduce:h-auto motion-reduce:py-10"
       >
         <div
           ref={pinRef}
-          className="relative flex min-h-svh w-full flex-col items-center justify-center overflow-hidden px-5 py-12 motion-reduce:min-h-0 motion-reduce:py-8"
+          className="relative flex min-h-0 w-full flex-col items-center justify-center gap-0 overflow-hidden px-5 py-8 max-md:gap-5 max-md:min-h-0 md:min-h-svh md:gap-0 md:py-10 motion-reduce:min-h-0 motion-reduce:py-8"
         >
           {/* Serum droplet halo (cosmetics metaphor) — outer div centers; inner ref scales (GSAP) */}
           <div
-            className="pointer-events-none absolute left-1/2 top-[36%] z-0 -translate-x-1/2 -translate-y-1/2 motion-reduce:hidden md:top-[38%]"
+            className="pointer-events-none absolute left-1/2 top-[36%] z-0 hidden -translate-x-1/2 -translate-y-1/2 max-md:hidden motion-reduce:hidden md:top-[38%] md:block"
             aria-hidden
           >
             <div
@@ -229,10 +289,10 @@ export const IngredientsSection = () => {
             <div
               key={item.title}
               data-ingredient-stage
-              className="ingredient-stage absolute inset-0 z-10 flex flex-col items-center justify-center gap-3 px-4 pt-8 motion-reduce:static motion-reduce:z-auto motion-reduce:min-h-0 motion-reduce:gap-4 motion-reduce:py-14"
+              className="ingredient-stage absolute inset-0 z-10 flex flex-col items-center justify-center gap-3 px-4 pt-8 max-md:static max-md:inset-auto max-md:z-auto max-md:min-h-0 max-md:gap-4 max-md:py-8 motion-reduce:static motion-reduce:z-auto motion-reduce:min-h-0 motion-reduce:gap-4 motion-reduce:py-14"
             >
               <p
-                className="pointer-events-none absolute bottom-6 right-4 font-brand text-[6rem] font-black leading-none text-white/8 motion-reduce:relative motion-reduce:bottom-auto motion-reduce:right-auto motion-reduce:order-last motion-reduce:text-5xl motion-reduce:opacity-40 md:text-[10rem] md:motion-reduce:text-6xl"
+                className="pointer-events-none absolute bottom-6 right-4 font-brand text-[6rem] font-black leading-none text-white/8 max-md:relative max-md:bottom-auto max-md:right-auto max-md:order-last max-md:text-5xl max-md:opacity-40 motion-reduce:relative motion-reduce:bottom-auto motion-reduce:right-auto motion-reduce:order-last motion-reduce:text-5xl motion-reduce:opacity-40 md:text-[10rem] md:motion-reduce:text-6xl"
                 aria-hidden
               >
                 {item.num}

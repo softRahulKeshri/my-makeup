@@ -6,6 +6,7 @@ import { useGSAP } from "@gsap/react";
 import Image from "next/image";
 import { useRef } from "react";
 import { ASSETS } from "@/constants/assets";
+import { INGREDIENT_IMAGE_ALT } from "@/constants/ingredient-image-alts";
 import type { IngredientGlyphId, IngredientGlyphProps } from "@/types/ingredients";
 
 gsap.registerPlugin(ScrollTrigger);
@@ -62,23 +63,23 @@ export const IngredientGlyph = ({
 
       const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
       if (mq.matches) {
-        gsap.set(wrap, { scale: 1, opacity: 1 });
+        gsap.set(wrap, { scale: 1, opacity: 1, y: 0 });
         return;
       }
 
       // Start slightly scaled down + invisible; GSAP blooms it up on scroll.
-      gsap.set(wrap, { scale: 0.78, opacity: 0, transformOrigin: "50% 50%" });
+      gsap.set(wrap, { scale: 0.78, opacity: 0, y: 28, transformOrigin: "50% 50%" });
 
       const tl = gsap.timeline({
         scrollTrigger: {
           trigger: root,
           start: "top 88%",
-          toggleActions: "play none none reverse",
+          toggleActions: "play none none none",
         },
-        defaults: { ease: "power3.out" },
+        defaults: { ease: "power2.out" },
       });
 
-      tl.to(wrap, { scale: 1, opacity: 1, duration: 0.85 });
+      tl.to(wrap, { scale: 1, opacity: 1, y: 0, duration: 0.95 });
 
       return () => tl.kill();
     },
@@ -136,7 +137,7 @@ export const IngredientGlyph = ({
           */}
           <Image
             src={src}
-            alt={`${kind} ingredient`}
+            alt={INGREDIENT_IMAGE_ALT[kind]}
             width={530}
             height={944}
             sizes="(max-width: 640px) 148px, (max-width: 768px) 180px, 220px"

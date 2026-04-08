@@ -95,7 +95,7 @@ export const metadata: Metadata = {
         url: "/opengraph-image",
         width: 1200,
         height: 630,
-        alt: `${APP_NAME} — Real Glow, Real You`,
+        alt: `${APP_NAME} Luminous Skin Face Cream 15ml — Real Glow, Real You`,
       },
     ],
   },
@@ -110,8 +110,8 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
-  maximumScale: 1,
-  userScalable: false,
+  maximumScale: 5,
+  userScalable: true,
   themeColor: "#080706",
 };
 

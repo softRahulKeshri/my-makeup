@@ -40,6 +40,8 @@
 html {
   /* Disable browser smooth-scroll — Lenis owns this */
   scroll-behavior: auto;
+  /* Fixed header + in-page anchors — avoids harsh jumps */
+  scroll-padding-top: 5rem;
 }
 
 body {
@@ -254,6 +256,33 @@ body {
 
 .lux-card-reveal {
   animation: lux-card-rise 0.85s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* Hero Buy Now — soft luminous pulse (respects reduced motion) */
+@keyframes lux-hero-buy-glow {
+  0%,
+  100% {
+    box-shadow:
+      0 0 22px rgba(212, 175, 55, 0.38),
+      0 12px 36px -8px rgba(212, 175, 55, 0.42);
+  }
+  50% {
+    box-shadow:
+      0 0 38px rgba(212, 175, 55, 0.55),
+      0 14px 42px -6px rgba(212, 175, 55, 0.52);
+  }
+}
+
+.lux-hero-buy-btn {
+  box-shadow:
+    0 0 28px rgba(212, 175, 55, 0.42),
+    0 12px 36px -8px rgba(212, 175, 55, 0.45);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .lux-hero-buy-btn {
+    animation: lux-hero-buy-glow 3.2s ease-in-out infinite;
+  }
 }
 
 /* Horizontal scroll: hide scrollbar but keep touch pan */

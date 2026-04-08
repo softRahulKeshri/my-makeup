@@ -1,6 +1,7 @@
 import { ImageResponse } from "next/og";
 
-export const alt = "Abha Cosmetic — Real Glow, Real You";
+export const alt =
+  "Abha Cosmetic Luminous Skin Face Cream 15ml — Real Glow, Real You luxury skincare";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
