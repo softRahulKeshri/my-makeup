@@ -472,8 +472,8 @@ body {
   opacity: 0;
 }
 
-/* ── Golden orb pulse (ingredients reveal) — GPU-friendly ring expansion ───── */
-@keyframes ingredient-golden-pulse {
+/* ── Serum-droplet halo pulse (ingredients reveal) — soft cosmetic glow ring ─ */
+@keyframes ingredient-cosmetic-pulse {
   0% {
     transform: scale(0.92);
     opacity: 0.55;
@@ -487,14 +487,14 @@ body {
   }
 }
 
-.ingredient-golden-pulse-ring {
+.ingredient-cosmetic-pulse-ring {
   border: 1px solid rgba(212, 175, 55, 0.45);
   border-radius: 9999px;
 }
 
 @media (prefers-reduced-motion: no-preference) {
-  .ingredient-golden-pulse-ring {
-    animation: ingredient-golden-pulse 2.4s ease-out infinite;
+  .ingredient-cosmetic-pulse-ring {
+    animation: ingredient-cosmetic-pulse 2.4s ease-out infinite;
   }
 }
 
@@ -508,4 +508,57 @@ body {
     opacity: 1 !important;
     transform: none !important;
   }
+}
+
+/* ── Ingredient Glyph -- real product photography with dark-bg blend ──────────
+   .ingredient-glyph-frame   outer animated wrapper (GSAP target)
+   .ingredient-glyph-inner   overflow:hidden frame that clips the scaled image
+   .ingredient-glyph-img     the actual next/image <img> tag
+
+   The frame dimensions use clamp() so the image scales gracefully from mobile
+   to desktop without a fixed breakpoint jump.
+
+   Why overflow:hidden on .ingredient-glyph-inner?
+   The inner <img> is scaled to 118% via inline transform to push the AI badge
+   below the visible area.  overflow:hidden is required to clip the overflowing
+   pixels before the CSS mask is applied. */
+
+.ingredient-glyph-frame {
+  /* Portrait ratio matching the source images (530 x 944) */
+  width: clamp(148px, 32vw, 220px);
+  aspect-ratio: 530 / 944;
+}
+
+.ingredient-glyph-inner {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  /* Radial mask: dissolves all four edges into the dark background.
+     The ellipse centre sits at 50% / 38% (slightly above vertical midpoint)
+     so the ingredient at the top stays fully vivid while the reflective
+     marble floor and badge at the bottom fade more aggressively. */
+  -webkit-mask-image: radial-gradient(
+    ellipse 88% 80% at 50% 38%,
+    black 32%,
+    rgba(0, 0, 0, 0.75) 52%,
+    transparent 72%
+  );
+  mask-image: radial-gradient(
+    ellipse 88% 80% at 50% 38%,
+    black 32%,
+    rgba(0, 0, 0, 0.75) 52%,
+    transparent 72%
+  );
+}
+
+/* The <img> itself: scale + translateY pushes the AI badge out of the frame.
+   These values are calibrated across all four ingredient images to ensure
+   no badge bleed and the ingredient remains well-centred after the expansion. */
+.ingredient-glyph-img {
+  transform: scale(1.18) translateY(-5%);
+  transform-origin: 50% 45%;
+  display: block;
+  width: 100%;
+  height: auto;
+  object-fit: cover;
 }
