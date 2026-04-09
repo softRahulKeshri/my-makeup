@@ -1,7 +1,7 @@
 /** Central paths for marketing media. */
 export const ASSETS = {
   /** Primary product jar — AI-shot on dark bg, blends seamlessly into the page. */
-  jarPng: "/images/jar.jpeg",
+  jarPng: "/images/jar.png",
   /** Per-ingredient product photography (AI-generated, portrait crop). */
   ingredientImages: {
     aloe: "/images/Alovera.png",

@@ -1,14 +1,15 @@
 import type { ContactInfo } from "@/types/contact";
+import { BRAND_NAME } from "@/constants/brand";
 
-/** Placeholder copy — replace with real details or wire NEXT_PUBLIC_* env vars. */
 export const CONTACT: ContactInfo = {
-  companyName: "Abha Cosmetic",
+  companyName: BRAND_NAME,
   addressLines: [
-    "123 Sample Street, Indiranagar",
-    "Bengaluru, Karnataka 560038",
-    "India",
+    "Shop No. 02, Tankhiwale Bada",
+    "G.E. Road, Block Dharsiwa",
+    "Tatyapara Road, Raipur",
+    "Raipur, Chhattisgarh — 492001",
   ],
-  email: "hello@abhacosmetic.example",
-  phone: "+91 00000 00000",
-  gst: "GSTIN · 00AAAAA0000A0Z0 (placeholder)",
+  email: "meenashakuresahu@gmail.com",
+  /** E.164-style for tel: links */
+  phone: "+91 93408 33427",
 };

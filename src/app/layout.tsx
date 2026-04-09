@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Cormorant, Fraunces, Montserrat, Playfair_Display } from "next/font/google";
+import { BRAND_NAME, PRODUCT_LINE } from "@/constants/brand";
 import { Providers } from "./providers";
 import "./globals.css";
 
@@ -29,8 +30,6 @@ const montserrat = Montserrat({
   display: "swap",
 });
 
-const APP_NAME = "Abha Cosmetic";
-
 /** Absolute URLs for OG/Twitter — set NEXT_PUBLIC_SITE_URL in production. */
 const getMetadataBase = () => {
   if (process.env.NEXT_PUBLIC_SITE_URL) {
@@ -42,30 +41,27 @@ const getMetadataBase = () => {
   return new URL("http://localhost:3000");
 };
 
-const META_DESCRIPTION =
-  "Abha Cosmetic — premium face care. Real Glow, Real You. Natural ingredients including aloe, orange, turmeric & avocado. 15ml face cream.";
+const META_DESCRIPTION = `${BRAND_NAME} · ${PRODUCT_LINE}. 15ml face cream — aloe, citrus, turmeric, avocado.`;
 
 export const metadata: Metadata = {
   metadataBase: getMetadataBase(),
-  applicationName: APP_NAME,
+  applicationName: BRAND_NAME,
   title: {
-    default: `${APP_NAME} · Real Glow, Real You`,
-    template: `%s · ${APP_NAME}`,
+    default: `${BRAND_NAME} · ${PRODUCT_LINE}`,
+    template: `%s · ${BRAND_NAME}`,
   },
   description: META_DESCRIPTION,
   keywords: [
-    "Abha Cosmetic",
+    BRAND_NAME,
     "face cream",
     "skin care",
     "natural ingredients",
     "aloe vera",
     "turmeric",
-    "vitamin C",
     "avocado",
-    "premium skincare",
     "India",
   ],
-  authors: [{ name: "Abha Cosmetic" }],
+  authors: [{ name: BRAND_NAME }],
   robots: {
     index: true,
     follow: true,
@@ -73,7 +69,7 @@ export const metadata: Metadata = {
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
-    title: "Abha",
+    title: BRAND_NAME,
   },
   formatDetection: {
     telephone: false,
@@ -86,8 +82,8 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     locale: "en_IN",
-    siteName: APP_NAME,
-    title: `${APP_NAME} · Real Glow, Real You`,
+    siteName: BRAND_NAME,
+    title: `${BRAND_NAME} · ${PRODUCT_LINE}`,
     description: META_DESCRIPTION,
     url: "/",
     images: [
@@ -95,13 +91,13 @@ export const metadata: Metadata = {
         url: "/opengraph-image",
         width: 1200,
         height: 630,
-        alt: `${APP_NAME} Luminous Skin Face Cream 15ml — Real Glow, Real You`,
+        alt: `${BRAND_NAME} ${PRODUCT_LINE} 15ml`,
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: `${APP_NAME} · Real Glow, Real You`,
+    title: `${BRAND_NAME} · ${PRODUCT_LINE}`,
     description: META_DESCRIPTION,
     images: ["/opengraph-image"],
   },

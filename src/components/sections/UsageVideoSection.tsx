@@ -207,7 +207,7 @@ export const UsageVideoSection = () => {
     <section
       ref={sectionRef}
       id="usage"
-      className="relative overflow-x-hidden px-5 py-14 md:py-20"
+      className="relative overflow-x-hidden px-5 py-20 md:py-28"
       aria-labelledby="usage-heading"
     >
       {/* Bottom glow — grounds the section visually */}

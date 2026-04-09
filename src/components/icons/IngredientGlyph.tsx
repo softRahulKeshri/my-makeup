@@ -25,23 +25,8 @@ const GLOW: Record<IngredientGlyphId, string> = {
 
 /**
  * IngredientGlyph — real AI product photography, watermark-free, dark-bg blended.
- *
- * Watermark removal strategy:
- *   The AI-generated images carry a small badge at the very bottom of the frame.
- *   We apply `transform: scale(1.18) translateY(-5%)` on the <img> so the badge
- *   is pushed below the container's clipped boundary (overflow: hidden on the frame).
- *   A CSS mask-image on the frame further dissolves all four edges into the dark
- *   page background, giving a "floating ingredient" feel with zero hard borders.
- *
- * Blend strategy:
- *   Both the product photos and the page background are near-black.  Rather than
- *   relying on mix-blend-mode (which flattens colour), we use:
- *     1. mask-image radial gradient → edges fade to transparent → page bg shows through
- *     2. A per-ingredient radial glow behind the frame → warm chromatic halo
- *     3. A subtle linear gradient overlay inside the frame for the bottom edge
- *
- * These three layers together make each image feel like it's *part of* the surface
- * rather than pasted on top of it.
+ * Scale on the <img> pushes the bottom badge below the clip; `data-ingredient` on the
+ * inner frame selects per-botanical organic `clip-path` + mask (see globals.css).
  */
 export const IngredientGlyph = ({
   kind,
@@ -89,7 +74,7 @@ export const IngredientGlyph = ({
   return (
     <div
       ref={rootRef}
-      className={`relative flex shrink-0 items-center justify-center ${className}`}
+      className={`ingredient-glyph-root relative flex shrink-0 items-center justify-center ${className}`}
     >
       {/*
         Ambient glow ring — sits BEHIND the frame in the stacking order.
@@ -112,22 +97,12 @@ export const IngredientGlyph = ({
       */}
       <div ref={wrapRef} className="ingredient-glyph-frame will-change-transform">
         {/*
-          Inner image container.
-          overflow: hidden  → clips the scaled-up image so the watermark sits below the fold.
-          mask-image        → radial ellipse centred high in the frame; edges dissolve to
-                              transparent so the dark page background bleeds through naturally.
-          The mask centre is at 50% / 38% (slightly above vertical centre) so the
-          ingredient at the top stays vivid while the reflective marble surface and
-          watermark at the bottom fade more aggressively.
+          Inner image container — organic clip-path (see globals.css) + soft radial mask
+          on the lower third so the scaled image still hides the AI badge cleanly.
         */}
         <div
+          data-ingredient={kind}
           className="ingredient-glyph-inner relative overflow-hidden"
-          style={{
-            WebkitMaskImage:
-              "radial-gradient(ellipse 88% 80% at 50% 38%, black 32%, rgba(0,0,0,0.75) 52%, transparent 72%)",
-            maskImage:
-              "radial-gradient(ellipse 88% 80% at 50% 38%, black 32%, rgba(0,0,0,0.75) 52%, transparent 72%)",
-          }}
         >
           {/*
             scale(1.18) → pushes the ~bottom-6% AI badge below the container boundary.

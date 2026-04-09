@@ -10,29 +10,22 @@ gsap.registerPlugin(ScrollTrigger);
 type SmoothScrollProps = { children: ReactNode };
 
 /**
- * SmoothScroll — Lenis v1.x + GSAP ScrollTrigger integration.
- * Touch: native momentum on narrow viewports (`syncTouch: false`) to avoid jank with heavy ScrollTrigger sections.
+ * SmoothScroll — Lenis on tablet/desktop only.
+ * Mobile (≤767px): native scroll + passive listener → ScrollTrigger.update. No Lenis rAF = smoother touch scrolling.
  */
 export const SmoothScroll = ({ children }: SmoothScrollProps) => {
   useLayoutEffect(() => {
     const mq = window.matchMedia("(max-width: 767px)");
     let lenis: Lenis | null = null;
     let tickerFn: ((time: number) => void) | null = null;
+    let removeNativeScroll: (() => void) | undefined;
 
-    const setup = () => {
-      if (tickerFn) {
-        gsap.ticker.remove(tickerFn);
-        tickerFn = null;
-      }
-      lenis?.destroy();
-
-      const touchNative = mq.matches;
+    const setupLenis = () => {
       lenis = new Lenis({
-        syncTouch: !touchNative,
-        touchMultiplier: touchNative ? 1.25 : 1.15,
+        syncTouch: false,
+        touchMultiplier: 1.15,
         smoothWheel: true,
-        /** Lower lerp = softer follow (less “snappy” wheel / trackpad). */
-        lerp: touchNative ? 0.09 : 0.075,
+        lerp: 0.075,
         wheelMultiplier: 0.82,
       });
 
@@ -43,31 +36,53 @@ export const SmoothScroll = ({ children }: SmoothScrollProps) => {
       };
       gsap.ticker.add(tickerFn);
       gsap.ticker.lagSmoothing(0);
+    };
+
+    const setupNativeOnly = () => {
+      const onScroll = () => {
+        ScrollTrigger.update();
+      };
+      window.addEventListener("scroll", onScroll, { passive: true });
+      removeNativeScroll = () => window.removeEventListener("scroll", onScroll);
+    };
+
+    const apply = () => {
+      if (tickerFn) {
+        gsap.ticker.remove(tickerFn);
+        tickerFn = null;
+      }
+      lenis?.destroy();
+      lenis = null;
+      removeNativeScroll?.();
+      removeNativeScroll = undefined;
+
+      if (mq.matches) {
+        setupNativeOnly();
+      } else {
+        setupLenis();
+      }
 
       requestAnimationFrame(() => ScrollTrigger.refresh());
     };
 
-    setup();
+    apply();
 
     const onResize = () => {
       lenis?.resize();
       ScrollTrigger.refresh();
     };
     window.addEventListener("resize", onResize, { passive: true });
-
-    const onMqChange = () => {
-      setup();
-    };
-    mq.addEventListener("change", onMqChange);
+    mq.addEventListener("change", apply);
 
     const rafId = requestAnimationFrame(() => ScrollTrigger.refresh());
 
     return () => {
       cancelAnimationFrame(rafId);
-      mq.removeEventListener("change", onMqChange);
+      mq.removeEventListener("change", apply);
       window.removeEventListener("resize", onResize);
       if (tickerFn) gsap.ticker.remove(tickerFn);
       lenis?.destroy();
+      removeNativeScroll?.();
     };
   }, []);
 

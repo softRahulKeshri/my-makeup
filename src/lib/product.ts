@@ -4,7 +4,7 @@ const MOCK_DELAY_MS = 400;
 
 const mockProduct: Product = {
   id: "abha-face-cream-15ml",
-  name: "Abha Face Cream",
+  name: "ABHA COSMETIC Face Cream",
   mrp: 799,
   currency: "INR",
   sizeLabel: "15ml",

@@ -2,12 +2,8 @@ import type { IngredientGlyphId } from "@/types/ingredients";
 
 /** Descriptive alt text for ingredient photography (SEO + accessibility). */
 export const INGREDIENT_IMAGE_ALT: Record<IngredientGlyphId, string> = {
-  aloe:
-    "Aloe vera plant extract for Abha Luminous Skin Face Cream — soothing hydration",
-  orange:
-    "Orange and citrus botanical for Abha Luminous Skin Face Cream — vitamin C brightening",
-  turmeric:
-    "Turmeric root botanical for Abha Luminous Skin Face Cream — radiance and even tone",
-  avocado:
-    "Avocado botanical oil for Abha Luminous Skin Face Cream — nourishing lipids",
+  aloe: "Aloe vera — ABHA COSMETIC Luminous Skin Face Cream",
+  orange: "Orange citrus botanical — ABHA COSMETIC Luminous Skin Face Cream",
+  turmeric: "Turmeric root — ABHA COSMETIC Luminous Skin Face Cream",
+  avocado: "Avocado — ABHA COSMETIC Luminous Skin Face Cream",
 };

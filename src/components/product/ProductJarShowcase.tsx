@@ -7,15 +7,15 @@ import { useRef } from "react";
 import { ASSETS } from "@/constants/assets";
 import type { ProductJarShowcaseProps } from "@/types/product-jar";
 
-// jar.jpeg natural resolution -- used for next/image layout hints.
-const JAR_WIDTH = 530;
-const JAR_HEIGHT = 944;
+// jar.png natural resolution — used for next/image layout hints.
+const JAR_WIDTH = 1536;
+const JAR_HEIGHT = 2754;
 
 export const ProductJarShowcase = ({
   widthClassName,
   sizes = "(max-width: 768px) 92vw, 420px",
   priority,
-  alt = "Abha Luminous Skin Face Cream 15ml jar luxury packaging on dark background",
+  alt = "ABHA COSMETIC Luminous Skin Face Cream 15ml jar",
   interactive = true,
 }: ProductJarShowcaseProps) => {
   const rootRef = useRef<HTMLDivElement>(null);
@@ -29,8 +29,10 @@ export const ProductJarShowcase = ({
       const tilt = tiltRef.current;
       if (!root || !floater || !tilt) return;
 
-      const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
-      if (mq.matches) return;
+      const mqReduce = window.matchMedia("(prefers-reduced-motion: reduce)");
+      const mqMobile = window.matchMedia("(max-width: 767px)");
+      /** Phones: static jar — no float, pulse, or tilt (GPU + main-thread friendly). */
+      if (mqReduce.matches || mqMobile.matches) return;
 
       gsap.set(tilt, { transformPerspective: 960 });
 
@@ -149,35 +151,21 @@ export const ProductJarShowcase = ({
           />
 
           {/*
-            Blend strategy for jar.jpeg:
-            The AI shot sits on near-black (#050504); our page is #080706.
-            A radial mask-image dissolves the rectangular image boundary so the
-            page background bleeds through all four edges with zero visible seam.
-
-            mask-image ellipse: 80% wide / 92% tall, centred at 48% vertical.
-            This keeps the jar label + gold highlight fully opaque while the
-            reflective floor and outer dark regions fade cleanly to transparent.
-
-            drop-shadow filter runs on the POST-mask alpha channel, so the golden
-            halo appears only around the visible portion -- matching a real studio glow.
+            Arched clip (CSS) gives a premium silhouette; soft radial mask keeps the
+            studio floor blending into the page. Glow lives on the clip wrapper so it
+            follows the arch.
           */}
-          <Image
-            src={ASSETS.jarPng}
-            alt={alt}
-            width={JAR_WIDTH}
-            height={JAR_HEIGHT}
-            priority={priority}
-            sizes={sizes}
-            className="relative z-10 mx-auto h-auto w-full max-w-[min(100%,460px)] object-contain"
-            style={{
-              WebkitMaskImage:
-                "radial-gradient(ellipse 80% 92% at 50% 48%, black 38%, rgba(0,0,0,0.88) 56%, transparent 76%)",
-              maskImage:
-                "radial-gradient(ellipse 80% 92% at 50% 48%, black 38%, rgba(0,0,0,0.88) 56%, transparent 76%)",
-              filter:
-                "drop-shadow(0 32px 56px rgba(0,0,0,0.52)) drop-shadow(0 8px 32px rgba(212,175,55,0.22)) drop-shadow(0 0 80px rgba(212,175,55,0.08))",
-            }}
-          />
+          <div className="product-jar-clip relative z-10 mx-auto w-full max-w-[min(100%,460px)]">
+            <Image
+              src={ASSETS.jarPng}
+              alt={alt}
+              width={JAR_WIDTH}
+              height={JAR_HEIGHT}
+              priority={priority}
+              sizes={sizes}
+              className="product-jar-clip-img relative z-10 mx-auto h-auto w-full object-contain"
+            />
+          </div>
         </div>
       </div>
     </div>

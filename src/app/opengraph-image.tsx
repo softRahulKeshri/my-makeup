@@ -1,7 +1,7 @@
 import { ImageResponse } from "next/og";
+import { BRAND_NAME, PRODUCT_LINE } from "@/constants/brand";
 
-export const alt =
-  "Abha Cosmetic Luminous Skin Face Cream 15ml — Real Glow, Real You luxury skincare";
+export const alt = `${BRAND_NAME} ${PRODUCT_LINE} 15ml`;
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -33,22 +33,21 @@ const Image = () =>
             color: "transparent",
           }}
         >
-          Abha Cosmetic
+          {BRAND_NAME}
         </div>
         <div
           style={{
             marginTop: 28,
-            fontSize: 36,
+            fontSize: 34,
             color: "#f4efe6",
-            opacity: 0.92,
-            fontStyle: "italic",
+            opacity: 0.88,
+            letterSpacing: "0.06em",
+            textTransform: "uppercase",
           }}
         >
-          Real Glow, Real You
+          {PRODUCT_LINE}
         </div>
-        <div style={{ marginTop: 20, fontSize: 22, color: "rgba(244,239,230,0.55)" }}>
-          Premium face care · 15ml
-        </div>
+        <div style={{ marginTop: 18, fontSize: 20, color: "rgba(244,239,230,0.5)" }}>15ml</div>
       </div>
     ),
     { ...size },

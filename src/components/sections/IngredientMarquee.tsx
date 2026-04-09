@@ -17,7 +17,7 @@ export const IngredientMarquee = ({ slides }: IngredientMarqueeProps) => {
 
   return (
     <div
-      className="relative z-20 isolate overflow-hidden py-4"
+      className="relative z-20 isolate overflow-hidden py-8 md:py-10"
       role="region"
       aria-label="Ingredient imagery"
     >

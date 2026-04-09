@@ -72,7 +72,10 @@ export const GoldenParticleField = ({
     const ctx = canvas.getContext("2d", { alpha: true });
     if (!ctx) return;
 
-    const count = Math.min(Math.max(24, particleCount), MAX_PARTICLES);
+    const count = Math.min(Math.max(0, particleCount), MAX_PARTICLES);
+    if (count < 1) {
+      return;
+    }
 
     const initParticles = (w: number, h: number) => {
       const [goldS, turS, chS] = readBrandParticleColors();
@@ -175,13 +178,15 @@ export const GoldenParticleField = ({
     };
   }, [reducedMotion, particleCount]);
 
+  const showGradientOnly = reducedMotion || particleCount < 1;
+
   return (
     <div
       ref={containerRef}
       className={`pointer-events-none fixed inset-0 z-0 overflow-hidden ${className}`}
       aria-hidden
     >
-      {reducedMotion ? (
+      {showGradientOnly ? (
         <div
           className="absolute inset-0 bg-[radial-gradient(ellipse_85%_55%_at_50%_20%,rgba(212,175,55,0.12),transparent_55%),radial-gradient(ellipse_70%_50%_at_80%_90%,rgba(228,143,15,0.08),transparent_50%),radial-gradient(ellipse_50%_40%_at_15%_75%,rgba(247,242,232,0.06),transparent_45%)]"
           aria-hidden

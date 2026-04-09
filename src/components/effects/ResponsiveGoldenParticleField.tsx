@@ -4,9 +4,10 @@ import { useEffect, useState } from "react";
 import { GoldenParticleField } from "@/components/effects/GoldenParticleField";
 
 const DESKTOP_COUNT = 72;
-const MOBILE_COUNT = 40;
+/** Mobile: gradient-only backdrop (no canvas rAF) — fastest scroll on phones. */
+const MOBILE_COUNT = 0;
 
-/** Fewer particles on narrow viewports to keep scroll-driven animations smooth. */
+/** Fewer particles on narrow viewports; 0 = skip canvas on mobile. */
 export const ResponsiveGoldenParticleField = () => {
   const [count, setCount] = useState(DESKTOP_COUNT);
 

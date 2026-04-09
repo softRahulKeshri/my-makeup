@@ -38,10 +38,10 @@
 }
 
 html {
-  /* Disable browser smooth-scroll — Lenis owns this */
+  /* Disable browser smooth-scroll — Lenis owns this on desktop */
   scroll-behavior: auto;
-  /* Fixed header + in-page anchors — avoids harsh jumps */
-  scroll-padding-top: 5rem;
+  /* Fixed header + safe area + in-page anchors */
+  scroll-padding-top: max(5rem, env(safe-area-inset-top, 0px) + 3.25rem);
 }
 
 body {
@@ -51,6 +51,8 @@ body {
   font-family: var(--font-montserrat), ui-sans-serif, system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  /* Faster tap response on mobile; avoids double-tap zoom delay on interactive controls */
+  touch-action: manipulation;
 }
 
 /* ── Performance: hint the GPU to composite these layers ahead of time ────────
@@ -67,10 +69,27 @@ body {
   z-index: 0;
   pointer-events: none;
   background:
-    radial-gradient(ellipse 120% 80% at 50% -20%, var(--lux-mesh-a), transparent 55%),
-    radial-gradient(ellipse 90% 60% at 100% 30%, var(--lux-mesh-b), transparent 50%),
-    radial-gradient(ellipse 70% 50% at 0% 80%, var(--lux-mesh-c), transparent 48%),
-    linear-gradient(180deg, var(--brand-bg-2) 0%, var(--brand-bg) 45%, #0a0908 100%);
+    radial-gradient(
+      ellipse 120% 80% at 50% -20%,
+      var(--lux-mesh-a),
+      transparent 55%
+    ),
+    radial-gradient(
+      ellipse 90% 60% at 100% 30%,
+      var(--lux-mesh-b),
+      transparent 50%
+    ),
+    radial-gradient(
+      ellipse 70% 50% at 0% 80%,
+      var(--lux-mesh-c),
+      transparent 48%
+    ),
+    linear-gradient(
+      180deg,
+      var(--brand-bg-2) 0%,
+      var(--brand-bg) 45%,
+      #0a0908 100%
+    );
 }
 
 .lux-page-bg::after {
@@ -82,7 +101,7 @@ body {
   mix-blend-mode: overlay;
 }
 
-@media (prefers-reduced-motion: no-preference) {
+@media (prefers-reduced-motion: no-preference) and (min-width: 768px) {
   .lux-page-bg {
     animation: lux-aurora 22s ease-in-out infinite alternate;
   }
@@ -258,7 +277,7 @@ body {
   animation: lux-card-rise 0.85s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
-/* Hero Buy Now — soft luminous pulse (respects reduced motion) */
+/* Primary Buy Now — gold pulse + hover “glow bloom” (scale 1.05) */
 @keyframes lux-hero-buy-glow {
   0%,
   100% {
@@ -273,15 +292,46 @@ body {
   }
 }
 
-.lux-hero-buy-btn {
+.lux-buy-now-primary {
+  position: relative;
+  isolation: isolate;
   box-shadow:
     0 0 28px rgba(212, 175, 55, 0.42),
     0 12px 36px -8px rgba(212, 175, 55, 0.45);
+  transition:
+    transform 0.45s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.45s ease;
 }
 
 @media (prefers-reduced-motion: no-preference) {
-  .lux-hero-buy-btn {
+  .lux-buy-now-primary {
     animation: lux-hero-buy-glow 3.2s ease-in-out infinite;
+  }
+}
+
+.lux-buy-now-primary:hover,
+.lux-buy-now-primary:focus-visible {
+  transform: scale(1.05);
+  animation: none;
+  box-shadow:
+    0 0 52px rgba(212, 175, 55, 0.72),
+    0 0 96px rgba(212, 175, 55, 0.38),
+    0 20px 48px -12px rgba(212, 175, 55, 0.58);
+}
+
+.lux-buy-now-primary:focus-visible {
+  outline: 2px solid rgba(212, 175, 55, 0.5);
+  outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lux-buy-now-primary {
+    animation: none;
+  }
+
+  .lux-buy-now-primary:hover,
+  .lux-buy-now-primary:focus-visible {
+    transform: none;
   }
 }
 
@@ -340,6 +390,12 @@ body {
   .brand-name-gradient {
     animation: lux-shimmer 9s ease-in-out infinite;
   }
+}
+
+/* Uppercase wordmark — Fraunces + gold gradient */
+.brand-name-display {
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
 }
 
 /* Auto-scrolling ingredient strip */
@@ -482,7 +538,8 @@ body {
    This CSS rule provides the persistent pulse animation for the middle
    step card on mobile where there's no pinned timeline. */
 @keyframes lux-step-pulse {
-  0%, 100% {
+  0%,
+  100% {
     box-shadow:
       0 0 0 0 rgba(212, 175, 55, 0.4),
       0 16px 48px -20px rgba(0, 0, 0, 0.6);
@@ -492,13 +549,6 @@ body {
       0 0 0 8px rgba(212, 175, 55, 0),
       0 24px 56px -16px rgba(212, 175, 55, 0.25);
   }
-}
-
-/* ── Scroll-reveal benefit labels baseline ───────────────────────────────────
-   GSAP sets opacity:0 programmatically in BenefitsPinSection.
-   This ensures SSR-rendered HTML doesn't flash the labels before JS runs. */
-.benefits-label-init {
-  opacity: 0;
 }
 
 /* ── Serum-droplet halo pulse (ingredients reveal) — soft cosmetic glow ring ─ */
@@ -539,21 +589,17 @@ body {
   }
 }
 
-/* ── Ingredient Glyph -- real product photography with dark-bg blend ──────────
-   .ingredient-glyph-frame   outer animated wrapper (GSAP target)
-   .ingredient-glyph-inner   overflow:hidden frame that clips the scaled image
-   .ingredient-glyph-img     the actual next/image <img> tag
+/* ── Ingredient Glyph — organic clip-path “liquid” blobs + soft mask ───────────
+   .ingredient-glyph-root     vertical rhythm so clipped shapes don’t collide
+   .ingredient-glyph-frame     GSAP scale target (portrait ratio)
+   .ingredient-glyph-inner     clip-path per botanical + hover morph (0.6s)
+   .ingredient-glyph-img       scaled to hide AI badge below clip */
 
-   The frame dimensions use clamp() so the image scales gracefully from mobile
-   to desktop without a fixed breakpoint jump.
-
-   Why overflow:hidden on .ingredient-glyph-inner?
-   The inner <img> is scaled to 118% via inline transform to push the AI badge
-   below the visible area.  overflow:hidden is required to clip the overflowing
-   pixels before the CSS mask is applied. */
+.ingredient-glyph-root {
+  margin-block: clamp(1.25rem, 4vw, 2.75rem);
+}
 
 .ingredient-glyph-frame {
-  /* Portrait ratio matching the source images (530 x 944) */
   width: clamp(148px, 32vw, 220px);
   aspect-ratio: 530 / 944;
 }
@@ -562,27 +608,96 @@ body {
   width: 100%;
   height: 100%;
   overflow: hidden;
-  /* Radial mask: dissolves all four edges into the dark background.
-     The ellipse centre sits at 50% / 38% (slightly above vertical midpoint)
-     so the ingredient at the top stays fully vivid while the reflective
-     marble floor and badge at the bottom fade more aggressively. */
+  transform-origin: 50% 50%;
+  transition:
+    clip-path 0.6s ease,
+    transform 0.6s ease;
+  /* Soft radial falloff keeps the marble floor / badge zone atmospheric */
   -webkit-mask-image: radial-gradient(
-    ellipse 88% 80% at 50% 38%,
-    black 32%,
-    rgba(0, 0, 0, 0.75) 52%,
-    transparent 72%
+    ellipse 92% 84% at 50% 36%,
+    black 38%,
+    rgba(0, 0, 0, 0.82) 58%,
+    transparent 78%
   );
   mask-image: radial-gradient(
-    ellipse 88% 80% at 50% 38%,
-    black 32%,
-    rgba(0, 0, 0, 0.75) 52%,
-    transparent 72%
+    ellipse 92% 84% at 50% 36%,
+    black 38%,
+    rgba(0, 0, 0, 0.82) 58%,
+    transparent 78%
   );
 }
 
-/* The <img> itself: scale + translateY pushes the AI badge out of the frame.
-   These values are calibrated across all four ingredient images to ensure
-   no badge bleed and the ingredient remains well-centred after the expansion. */
+/* Per-botanical organic silhouettes (same point order → smooth hover morph) */
+.ingredient-glyph-inner[data-ingredient="aloe"] {
+  clip-path: path(
+    "M 50% 2% C 78% 2% 96% 24% 96% 50% C 96% 82% 74% 98% 50% 98% C 26% 98% 4% 82% 4% 50% C 4% 24% 22% 2% 50% 2% Z"
+  );
+}
+
+.ingredient-glyph-inner[data-ingredient="orange"] {
+  clip-path: path(
+    "M 50% 5% C 74% 5% 93% 26% 93% 50% C 93% 76% 73% 95% 50% 95% C 27% 95% 7% 76% 7% 50% C 7% 26% 26% 5% 50% 5% Z"
+  );
+}
+
+.ingredient-glyph-inner[data-ingredient="turmeric"] {
+  clip-path: path(
+    "M 50% 1% C 80% 1% 98% 28% 98% 54% C 98% 86% 72% 99% 50% 99% C 28% 99% 2% 86% 2% 54% C 2% 28% 20% 1% 50% 1% Z"
+  );
+}
+
+.ingredient-glyph-inner[data-ingredient="avocado"] {
+  clip-path: path(
+    "M 50% 3% C 82% 3% 99% 22% 99% 48% C 99% 80% 78% 97% 50% 97% C 22% 97% 1% 80% 1% 48% C 1% 22% 18% 3% 50% 3% Z"
+  );
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .ingredient-glyph-inner[data-ingredient="aloe"]:hover {
+    clip-path: path(
+      "M 50% 0% C 80% 0% 100% 22% 100% 50% C 100% 84% 76% 100% 50% 100% C 24% 100% 0% 84% 0% 50% C 0% 22% 20% 0% 50% 0% Z"
+    );
+  }
+
+  .ingredient-glyph-inner[data-ingredient="orange"]:hover {
+    clip-path: path(
+      "M 50% 3% C 76% 3% 96% 24% 96% 50% C 96% 78% 75% 97% 50% 97% C 25% 97% 4% 78% 4% 50% C 4% 24% 24% 3% 50% 3% Z"
+    );
+  }
+
+  .ingredient-glyph-inner[data-ingredient="turmeric"]:hover {
+    clip-path: path(
+      "M 50% 0% C 82% 0% 100% 26% 100% 52% C 100% 88% 74% 100% 50% 100% C 26% 100% 0% 88% 0% 52% C 0% 26% 18% 0% 50% 0% Z"
+    );
+  }
+
+  .ingredient-glyph-inner[data-ingredient="avocado"]:hover {
+    clip-path: path(
+      "M 50% 1% C 84% 1% 100% 20% 100% 46% C 100% 82% 80% 99% 50% 99% C 20% 99% 0% 82% 0% 46% C 0% 20% 16% 1% 50% 1% Z"
+    );
+  }
+}
+
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .ingredient-glyph-inner {
+      animation: ingredient-liquid-entry linear forwards;
+      animation-timeline: view();
+      animation-range: entry 0% entry 55%;
+    }
+  }
+}
+
+@keyframes ingredient-liquid-entry {
+  from {
+    transform: scale(0.96);
+  }
+
+  to {
+    transform: scale(1);
+  }
+}
+
 .ingredient-glyph-img {
   transform: scale(1.18) translateY(-5%);
   transform-origin: 50% 45%;
@@ -590,4 +705,71 @@ body {
   width: 100%;
   height: auto;
   object-fit: cover;
+}
+
+/* Hero jar — arched silhouette (curved top, flat bottom), premium studio glow */
+.product-jar-clip {
+  clip-path: path("M 0 100% L 0 31% Q 50% 3% 100% 31% L 100% 100% Z");
+  transition: clip-path 0.6s ease;
+  filter: drop-shadow(0 32px 56px rgba(0, 0, 0, 0.52))
+    drop-shadow(0 8px 32px rgba(212, 175, 55, 0.22))
+    drop-shadow(0 0 80px rgba(212, 175, 55, 0.08));
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .product-jar-clip:hover {
+    clip-path: path("M 0 100% L 0 28% Q 50% 1% 100% 28% L 100% 100% Z");
+  }
+}
+
+.product-jar-clip-img {
+  -webkit-mask-image: radial-gradient(
+    ellipse 82% 90% at 50% 48%,
+    black 40%,
+    rgba(0, 0, 0, 0.9) 58%,
+    transparent 78%
+  );
+  mask-image: radial-gradient(
+    ellipse 82% 90% at 50% 48%,
+    black 40%,
+    rgba(0, 0, 0, 0.9) 58%,
+    transparent 78%
+  );
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ingredient-glyph-inner {
+    transition: none;
+    animation: none !important;
+  }
+
+  .product-jar-clip {
+    transition: none;
+  }
+}
+
+/* “LUMINOUS” — Cormorant: slightly stronger weight + hairline shadow for legibility */
+.hero-line-luminous .hero-char {
+  font-weight: 700;
+  text-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.45),
+    0 0 24px rgba(244, 239, 230, 0.06);
+}
+
+/* MRP — high contrast, readable above CTA */
+.hero-price-line {
+  font-size: clamp(1.0625rem, 3.2vw, 1.375rem);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--brand-ink);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
+}
+
+.hero-price-line .hero-price-amount {
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  color: var(--brand-gold-bright);
+  text-shadow:
+    0 0 20px rgba(212, 175, 55, 0.22),
+    0 1px 2px rgba(0, 0, 0, 0.4);
 }
