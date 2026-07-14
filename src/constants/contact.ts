@@ -4,12 +4,12 @@ import { BRAND_NAME } from "@/constants/brand";
 export const CONTACT: ContactInfo = {
   companyName: BRAND_NAME,
   addressLines: [
-    "Shop No. 02, Tankhiwale Bada",
+    "Shop No. 02, Vidyut Nagar Bada",
     "G.E. Road, Block Dharsiwa",
-    "Tatyapara Road, Raipur",
-    "Raipur, Chhattisgarh — 492001",
+    "Mahanagar, Pune City",
+    "Pune, Maharashtra — 411001",
   ],
-  email: "meenashakuresahu@gmail.com",
+  email: "sample@example.com",
   /** E.164-style for tel: links */
-  phone: "+91 93408 33427",
+  phone: "+91 1234567890",
 };
